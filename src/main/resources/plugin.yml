@@ -1,0 +1,6 @@
+name: QuickHome
+version: '1.0.0'
+main: toutouchien.quickhome.QuickHome
+api-version: '1.21'
+load: STARTUP
+authors: [ Toutouchien ]
