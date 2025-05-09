@@ -17,9 +17,9 @@ public final class CommandData {
 	private List<SubCommand> subCommands;
 	private boolean hasParameterBeforeSubcommands;
 
-	public CommandData(String name, String pluginName) {
+	public CommandData(String name) {
 		this.name = name;
-		this.pluginName = pluginName;
+		this.pluginName = "quickhome";
 		this.subCommands = new ArrayList<>();
 
 		this.description = "";

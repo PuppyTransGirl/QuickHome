@@ -1,0 +1,5 @@
+lang: "en_US"
+
+min_home_name_length: 3
+max_home_name_length: 20
+home_name_validation_regex: "^[a-zA-Z0-9_-]+$"

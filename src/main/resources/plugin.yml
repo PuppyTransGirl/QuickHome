@@ -1,5 +1,5 @@
 name: QuickHome
-version: '1.0.0'
+version: '${project.version}'
 main: toutouchien.quickhome.QuickHome
 api-version: '1.21'
 load: STARTUP
