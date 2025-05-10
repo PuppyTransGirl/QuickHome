@@ -21,7 +21,13 @@ public class HomeManager {
 
     private final Map<UUID, List<Home>> homes;
 
-    public HomeManager() {
+    public HomeManager(@NotNull QuickHome plugin) {
+        this.plugin = plugin;
+
+        this.homesFolder = new File(plugin.getDataFolder(), "homes");
+        if (!this.homesFolder.exists())
+            this.homesFolder.mkdirs();
+
         this.homes = new HashMap<>();
     }
 

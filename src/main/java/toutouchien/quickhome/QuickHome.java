@@ -28,7 +28,7 @@ public final class QuickHome extends JavaPlugin {
         Lang.load(this);
 
         this.commandManager = new CommandManager();
-        this.homeManager = new HomeManager();
+        this.homeManager = new HomeManager(this);
 
         (this.homeConfig = new HomeConfig(this)).initialize();
 
