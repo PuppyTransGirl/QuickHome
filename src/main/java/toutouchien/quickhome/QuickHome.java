@@ -28,7 +28,7 @@ public final class QuickHome extends JavaPlugin {
         Lang.load(this);
 
         this.commandManager = new CommandManager();
-        this.homeManager = new HomeManager(this);
+        (this.homeManager = new HomeManager(this)).initialize();
 
         (this.homeConfig = new HomeConfig(this)).initialize();
 
@@ -50,7 +50,7 @@ public final class QuickHome extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        this.homeManager.stop();
     }
 
     public void reload() {
@@ -63,5 +63,10 @@ public final class QuickHome extends JavaPlugin {
     @NotNull
     public HomeConfig homeConfig() {
         return homeConfig;
+    }
+
+    @NotNull
+    public HomeManager homeManager() {
+        return homeManager;
     }
 }

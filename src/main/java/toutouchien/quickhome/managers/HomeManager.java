@@ -5,6 +5,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import toutouchien.quickhome.QuickHome;
@@ -29,6 +30,16 @@ public class HomeManager {
             this.homesFolder.mkdirs();
 
         this.homes = new HashMap<>();
+    }
+
+    public void initialize() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                saveHomes();
+                plugin.getSLF4JLogger().info("Periodic save - Homes");
+            }
+        }.runTaskTimerAsynchronously(this.plugin, 20L * 60L * 30L, 20L * 60L * 30L);
     }
 
     public void createHome(@NotNull UUID uuid, @NotNull String homeName, @NotNull Location location) {
@@ -154,8 +165,16 @@ public class HomeManager {
             try {
                 config.save(file);
             } catch (Exception e) {
-                plugin.getSLF4JLogger().warn("Failed to save homes for " + uuid, e);
+                plugin.getSLF4JLogger().warn("Failed to save homes for {}", uuid, e);
             }
         }
+    }
+
+    public void unloadHomes(@NotNull UUID uuid) {
+        this.homes.remove(uuid);
+    }
+
+    public void stop() {
+        this.saveHomes();
     }
 }
