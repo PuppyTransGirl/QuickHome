@@ -81,10 +81,18 @@ public final class Lang {
     }
 
     public static void sendMessage(@NotNull CommandSender sender, @NotNull String key) {
-        sender.sendMessage(get(key));
+        Component message = get(key);
+        if (message == Component.empty())
+            return;
+
+        sender.sendMessage(message);
     }
 
     public static void sendMessage(@NotNull CommandSender sender, @NotNull String key, @NotNull Object @NotNull ... args) {
-        sender.sendMessage(get(key, args));
+        Component message = get(key, args);
+        if (message == Component.empty())
+            return;
+
+        sender.sendMessage(message);
     }
 }
