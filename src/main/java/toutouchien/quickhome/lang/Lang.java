@@ -92,7 +92,7 @@ public final class Lang {
         if (usePlayerLocale && sender instanceof Player player)
             locale = player.locale();
 
-        String message = MESSAGES.getOrDefault(locale, Collections.emptyMap()).getOrDefault(key, key);
+        String message = MESSAGES.getOrDefault(locale, MESSAGES.getOrDefault(defaultLocale, Collections.emptyMap())).getOrDefault(key, key);
         return args.length > 0 ? message.formatted(args) : message;
     }
 
