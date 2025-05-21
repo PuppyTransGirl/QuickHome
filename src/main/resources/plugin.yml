@@ -4,3 +4,32 @@ main: toutouchien.quickhome.QuickHome
 api-version: '1.21'
 load: STARTUP
 authors: [ Toutouchien ]
+
+permissions:
+  quickhome.command.deletehome:
+    description: Allows deleting homes
+    default: op
+
+  quickhome.command.home:
+    description: Allows teleporting to homes
+    default: op
+
+  quickhome.command.sethome:
+    description: Allows setting homes
+    default: op
+
+  quickhome.command.deletehome.other:
+    description: Allows deleting other players' homes
+    default: op
+
+  quickhome.command.home.other:
+    description: Allows teleporting to other players' homes
+    default: op
+
+  quickhome.maxhomes.<number>:
+    description: "Sets the maximum number of homes a player can have (default: 5)"
+    default: op
+
+  quickhome.command.quickhome:
+    description: Allows using the /quickhome command
+    default: op
