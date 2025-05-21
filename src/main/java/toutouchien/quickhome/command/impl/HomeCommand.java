@@ -36,26 +36,30 @@ public class HomeCommand extends Command {
         String arg = args[0];
 
         if (!arg.contains(":") || !player.hasPermission("quickhome.command.home.other")) {
-            teleportToHome(player, player.getUniqueId(), arg);
+            teleportToHome(player, player.getUniqueId(), arg, false);
             return;
         }
 
         String[] splitText = arg.split(":");
         OfflinePlayer targetPlayer = Bukkit.getOfflinePlayer(splitText[0]);
         if (!targetPlayer.hasPlayedBefore()) {
-            Lang.sendMessage(player, "home_player_not_found", splitText[0]);
+            Lang.sendMessage(player, "home_player_not_found_other", splitText[0]);
             return;
         }
 
         UUID targetUUID = targetPlayer.getUniqueId();
         String homeName = splitText[1];
-        teleportToHome(player, targetUUID, homeName);
+        teleportToHome(player, targetUUID, homeName, true);
     }
 
-    private void teleportToHome(@NotNull Player player, @NotNull UUID targetUUID, @NotNull String homeName) {
+    private void teleportToHome(@NotNull Player player, @NotNull UUID targetUUID, @NotNull String homeName, boolean admin) {
         Home home = this.homeManager.homeByName(targetUUID, homeName);
-        if (home == null) {
+        if (!admin && home == null) {
             Lang.sendMessage(player, "home_home_not_found", homeName);
+            return;
+        } else if (home == null) {
+            String name = Bukkit.getOfflinePlayer(targetUUID).getName();
+            Lang.sendMessage(player, "home_home_not_found_other", name == null ? "null" : name, homeName);
             return;
         }
 

@@ -37,26 +37,30 @@ public class DeleteHomeCommand extends Command {
         String arg = args[0];
 
         if (!arg.contains(":") || !player.hasPermission("quickhome.command.deletehome.other")) {
-            deleteHome(player, player.getUniqueId(), arg);
+            deleteHome(player, player.getUniqueId(), arg, false);
             return;
         }
 
         String[] splitText = arg.split(":");
         OfflinePlayer targetPlayer = Bukkit.getOfflinePlayer(splitText[0]);
         if (!targetPlayer.hasPlayedBefore()) {
-            Lang.sendMessage(player, "deletehome_player_not_found", splitText[0]);
+            Lang.sendMessage(player, "deletehome_player_not_found_other", splitText[0]);
             return;
         }
 
         UUID targetUUID = targetPlayer.getUniqueId();
         String homeName = splitText[1];
-        deleteHome(player, targetUUID, homeName);
+        deleteHome(player, targetUUID, homeName, true);
     }
 
-    private void deleteHome(@NotNull Player player, @NotNull UUID targetUUID, @NotNull String homeName) {
+    private void deleteHome(@NotNull Player player, @NotNull UUID targetUUID, @NotNull String homeName, boolean admin) {
         Home home = this.homeManager.homeByName(targetUUID, homeName);
-        if (home == null) {
+        if (!admin && home == null) {
             Lang.sendMessage(player, "deletehome_home_not_found", homeName);
+            return;
+        } else if (home == null) {
+            String name = Bukkit.getOfflinePlayer(targetUUID).getName();
+            Lang.sendMessage(player, "deletehome_home_not_found_other", name == null ? "null" : name, homeName);
             return;
         }
 
