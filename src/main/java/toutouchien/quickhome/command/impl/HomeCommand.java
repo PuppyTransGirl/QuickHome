@@ -9,10 +9,10 @@ import toutouchien.quickhome.command.CommandData;
 import toutouchien.quickhome.lang.Lang;
 import toutouchien.quickhome.managers.HomeManager;
 import toutouchien.quickhome.models.Home;
+import toutouchien.quickhome.utils.PlayerUtils;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 public class HomeCommand extends Command {
     private final HomeManager homeManager;
@@ -36,29 +36,34 @@ public class HomeCommand extends Command {
         String arg = args[0];
 
         if (!arg.contains(":") || !player.hasPermission("quickhome.command.home.other")) {
-            teleportToHome(player, player.getUniqueId(), arg, false);
+            teleportToHome(player, player, arg, false);
             return;
         }
 
         String[] splitText = arg.split(":");
-        OfflinePlayer targetPlayer = Bukkit.getOfflinePlayer(splitText[0]);
-        if (!targetPlayer.hasPlayedBefore()) {
-            Lang.sendMessage(player, "home_player_not_found_other", splitText[0]);
+        String targetPlayerName = splitText[0];
+        if (!PlayerUtils.isValidPlayerName(targetPlayerName)) {
+            Lang.sendMessage(player, "home_player_not_found_other", targetPlayerName);
             return;
         }
 
-        UUID targetUUID = targetPlayer.getUniqueId();
+        OfflinePlayer targetPlayer = Bukkit.getOfflinePlayer(targetPlayerName);
+        if (!targetPlayer.hasPlayedBefore()) {
+            Lang.sendMessage(player, "home_player_not_found_other", targetPlayerName);
+            return;
+        }
+
         String homeName = splitText[1];
-        teleportToHome(player, targetUUID, homeName, true);
+        teleportToHome(player, targetPlayer, homeName, true);
     }
 
-    private void teleportToHome(@NotNull Player player, @NotNull UUID targetUUID, @NotNull String homeName, boolean admin) {
-        Home home = this.homeManager.homeByName(targetUUID, homeName);
+    private void teleportToHome(@NotNull Player player, @NotNull OfflinePlayer target, @NotNull String homeName, boolean admin) {
+        Home home = this.homeManager.homeByName(target.getUniqueId(), homeName);
         if (!admin && home == null) {
             Lang.sendMessage(player, "home_home_not_found", homeName);
             return;
         } else if (home == null) {
-            String name = Bukkit.getOfflinePlayer(targetUUID).getName();
+            String name = target.getName();
             Lang.sendMessage(player, "home_home_not_found_other", name == null ? "null" : name, homeName);
             return;
         }
@@ -85,6 +90,9 @@ public class HomeCommand extends Command {
 
         String[] splitText = currentArg.split(":");
         String targetPlayerName = splitText[0];
+        if (!PlayerUtils.isValidPlayerName(targetPlayerName))
+            return Collections.emptyList();
+
         OfflinePlayer targetPlayer = Bukkit.getOfflinePlayer(targetPlayerName);
         if (!targetPlayer.hasPlayedBefore())
             return Collections.emptyList();
