@@ -1,5 +1,7 @@
 package toutouchien.quickhome.command.impl;
 
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import toutouchien.quickhome.command.Command;
@@ -10,6 +12,7 @@ import toutouchien.quickhome.models.Home;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 public class HomeCommand extends Command {
     private final HomeManager homeManager;
@@ -30,9 +33,27 @@ public class HomeCommand extends Command {
             return;
         }
 
-        String homeName = args[0];
+        String arg = args[0];
 
-        Home home = this.homeManager.homeByName(player.getUniqueId(), homeName);
+        if (!arg.contains(":") || !player.hasPermission("quickhome.command.home.other")) {
+            teleportToHome(player, player.getUniqueId(), arg);
+            return;
+        }
+
+        String[] splitText = arg.split(":");
+        OfflinePlayer targetPlayer = Bukkit.getOfflinePlayer(splitText[0]);
+        if (!targetPlayer.hasPlayedBefore()) {
+            Lang.sendMessage(player, "home_player_not_found", splitText[0]);
+            return;
+        }
+
+        UUID targetUUID = targetPlayer.getUniqueId();
+        String homeName = splitText[1];
+        teleportToHome(player, targetUUID, homeName);
+    }
+
+    private void teleportToHome(@NotNull Player player, @NotNull UUID targetUUID, @NotNull String homeName) {
+        Home home = this.homeManager.homeByName(targetUUID, homeName);
         if (home == null) {
             Lang.sendMessage(player, "home_home_not_found", homeName);
             return;
@@ -48,9 +69,31 @@ public class HomeCommand extends Command {
             return Collections.emptyList();
 
         String currentArg = args[argIndex];
-        return this.homeManager.homes(player.getUniqueId()).stream()
-                .map(Home::name)
-                .filter(homeName -> homeName.startsWith(currentArg))
+        if (!currentArg.contains(":")) {
+            return this.homeManager.homes(player.getUniqueId()).stream()
+                    .map(Home::name)
+                    .filter(homeName -> homeName.startsWith(currentArg))
+                    .toList();
+        }
+
+        if (!player.hasPermission("quickhome.command.home.other"))
+            return Collections.emptyList();
+
+        String[] splitText = currentArg.split(":");
+        String targetPlayerName = splitText[0];
+        OfflinePlayer targetPlayer = Bukkit.getOfflinePlayer(targetPlayerName);
+        if (!targetPlayer.hasPlayedBefore())
+            return Collections.emptyList();
+
+        List<String> homesNames = this.homeManager.homes(targetPlayer.getUniqueId()).stream()
+                .map(home -> targetPlayerName + ":" + home.name())
+                .toList();
+
+        if (splitText.length == 1)
+            return homesNames;
+
+        return homesNames.stream()
+                .filter(homeName -> (targetPlayerName + ":" + homeName).toLowerCase().startsWith(currentArg.toLowerCase()))
                 .toList();
     }
 }
